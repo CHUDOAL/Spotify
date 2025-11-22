@@ -50,17 +50,25 @@ app.get('/callback', async (req, res) => {
     const code = req.query.code;
     if (!code) return res.send('No code provided');
 
+    // Debug logging (safe, showing only partial keys)
+    console.log('Attempting to exchange code for token...');
+    console.log('ClientID (first 4):', CLIENT_ID ? CLIENT_ID.substring(0, 4) : 'undefined');
+    console.log('ClientSecret length:', CLIENT_SECRET ? CLIENT_SECRET.length : 0);
+    console.log('Redirect URI used:', REDIRECT_URI);
+
     try {
-        const response = await axios.post('https://accounts.spotify.com/api/token', new URLSearchParams({
-            grant_type: 'authorization_code',
-            code: code,
-            redirect_uri: REDIRECT_URI,
-        }), {
+        const authOptions = {
             headers: {
                 'Authorization': 'Basic ' + (Buffer.from(CLIENT_ID + ':' + CLIENT_SECRET).toString('base64')),
                 'Content-Type': 'application/x-www-form-urlencoded'
             }
-        });
+        };
+        
+        const response = await axios.post('https://accounts.spotify.com/api/token', new URLSearchParams({
+            grant_type: 'authorization_code',
+            code: code,
+            redirect_uri: REDIRECT_URI,
+        }), authOptions);
 
         const tokens = {
             access_token: response.data.access_token,
