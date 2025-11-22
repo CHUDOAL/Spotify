@@ -12,7 +12,7 @@ app.use(express.static('public'));
 
 const CLIENT_ID = process.env.SPOTIFY_CLIENT_ID;
 const CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET;
-const REDIRECT_URI = process.env.REDIRECT_URI || 'http://localhost:8888/callback';
+const REDIRECT_URI = process.env.REDIRECT_URI || 'https://spotify-0p8r.onrender.com/callback';
 const PORT = process.env.PORT || 8888;
 
 const TOKEN_PATH = path.join(__dirname, 'tokens.json');
@@ -33,11 +33,14 @@ const loadTokens = () => {
 // Login endpoint
 app.get('/login', (req, res) => {
     const scope = 'user-read-currently-playing user-read-playback-state';
+    // Use dynamic Redirect URI from env or fallback
+    const redirectUri = process.env.REDIRECT_URI || 'https://spotify-0p8r.onrender.com/callback';
+    
     const params = new URLSearchParams({
         response_type: 'code',
         client_id: CLIENT_ID,
         scope: scope,
-        redirect_uri: REDIRECT_URI,
+        redirect_uri: redirectUri,
     });
     res.redirect('https://accounts.spotify.com/authorize?' + params.toString());
 });
